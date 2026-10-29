@@ -6,5 +6,5 @@ renders/
 *.wav
 .remotion/
 
-# v0.2 work in progress: kept locally, not published until cleaned (see next/README.md)
+# local work, not published
 next/

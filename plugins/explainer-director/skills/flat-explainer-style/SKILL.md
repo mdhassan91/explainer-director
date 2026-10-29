@@ -93,8 +93,3 @@ blindfold = "people who don't understand". Same character every scene → contin
 - Checklist before render: one idea per frame · every number spoken = number shown · pops land on the word ·
   ≥ 55 % empty cream · palette limited to cream/teal (+ sepia scenes, tiny accents).
 - 1080×1920 Shorts: stack the talker above the icons.
-
-## 6. 3D version
-The same palette and grammar can be staged on a small 3D planet with animated CC0 characters (two-tone toon, ink
-outlines, one continuous camera per chapter, sepia as a post effect). That needs the 3D kit, which ships in a later
-version of this plugin.

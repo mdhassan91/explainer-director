@@ -82,16 +82,15 @@ pulse for the race). Silence never happens inside a chapter; chapter cards are t
 whoosh + hit on the card).
 
 ## 6. What this means for our pipeline
-- This look is **2D/2.5D compositing**, not 3D: stills, cut-outs, type, icons, maps, light leaks. It renders far
-  faster than our three.js scenes — a 15-minute video is realistic in HyperFrames/Remotion 2D.
-- Our 3D painted-documentary characters can still play the "hero" shots; the rest is collage + infographic.
+- This look is **2D/2.5D compositing**: stills, cut-outs, type, icons, maps, light leaks. It renders fast, so a
+  15-minute video is realistic.
 - Kit pieces to build once and reuse: light-leak flash, burn/torn-paper wipe, texture-filled giant word,
   tape label, chapter card, flow/triangle/pie/counter infographics, map with route, clock timer, dust layer,
   flying-object transition, photo-in-paper-frame with push-in.
 
 ## 7. In this plugin
 The flat 2D engine (`engine/src/lib`) already covers kinetic caps on the word, tape labels, stamps, counters, chapter cards,
-maps with routes, process lines, split screens and quote cards. Planned for the next version: light-leak flash,
-burn/torn-paper wipe, texture-filled giant word, dust layer and photo-in-paper-frame (the 2.5D documentary kit).
+maps with routes, process lines, split screens and quote cards, plus light-leak flashes and dust between chapters.
+Still to build yourself as scenes if a video needs them: burn/torn-paper wipe, texture-filled giant word, photo-in-paper-frame.
 Measured on the earlier prototype: 35.5 s at 1080p30 in 2 min 20 s (~7.6 fps; SVG turbulence filters are the cost) →
 bake paper/grunge textures to images once instead of per-frame SVG noise.

@@ -14,8 +14,6 @@ This skill decides the order of work. Everything it needs ships with this plugin
 | Palette, typography, chapter cards, "#N" lesson format, sepia case studies | **flat-explainer-style** |
 | Long-form story structure | `references/story-documentary-study.md` |
 
-3D worlds, the painted 2D look and acted character scenes come in a later version of this plugin.
-
 ## First run: set up a project (once per video project folder)
 1. Copy the engine into the user's working folder: `cp -r <plugin>/engine ./<project-name>` (never edit the plugin copy).
 2. `cd <project-name> && bash setup.sh` — installs npm + Python packages, downloads the Kokoro voice model
@@ -147,8 +145,6 @@ every CREDITS.md entry present.
 - Long renders: render in chapters or 600-frame segments with a fresh browser each — avoids GPU out-of-memory blank
   frames on small GPUs (4 GB VRAM). To fix a bad stretch, re-render only those segments, then re-concat and mux.
 - Audio for 15–20-min films: mix in float32, mono voice, cumsum envelopes — stays under 7 GB RAM.
-- 3D planet worlds (next version): keep ≥ 0.6 rad between neighbouring areas, and hide tall props once their area has
-  turned more than ~0.5 rad past the camera, or the camera flies through them.
 - Building is the real cost, not rendering — that is why the templates and the gates matter.
 
 ## B-roll house treatment
