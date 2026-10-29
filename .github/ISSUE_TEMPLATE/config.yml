@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/mdhassan91/explainer-director/discussions
+    about: How do I…? Ideas, tips and general chat go in Discussions.

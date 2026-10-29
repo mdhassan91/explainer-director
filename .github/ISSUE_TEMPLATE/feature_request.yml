@@ -1,0 +1,23 @@
+name: Feature request
+description: Something you want to make that the plugin can't do yet
+labels: [enhancement]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to make?
+      description: The kind of video, who it's for, and how long it is.
+    validations:
+      required: true
+  - type: textarea
+    id: missing
+    attributes:
+      label: What's missing or getting in the way?
+      description: A template, a look, a voice option, a format (like vertical 9:16)…
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example or reference (optional)
+      description: A link or a description of a video that does what you mean.

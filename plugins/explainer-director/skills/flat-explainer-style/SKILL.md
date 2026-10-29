@@ -92,4 +92,4 @@ blindfold = "people who don't understand". Same character every scene → contin
 - Voice: Kokoro `am_michael` / `af_heart` (offline) or the user's own recording.
 - Checklist before render: one idea per frame · every number spoken = number shown · pops land on the word ·
   ≥ 55 % empty cream · palette limited to cream/teal (+ sepia scenes, tiny accents).
-- 1080×1920 Shorts: stack the talker above the icons.
+- Vertical 1080×1920 (Shorts) isn't supported by the v0.1 engine; when it is, stack the talker above the icons.

@@ -1,7 +1,7 @@
 ---
 name: video-director
-description: Run a whole explainer video from the user's script to an upload-ready MP4 — beat map, story arc, pacing check, style check, scene build, draft render, final render, mix and delivery — with approval gates so nothing expensive is rendered before the user has agreed. Uses the bundled engine (script.txt → voice → music → render) and flat-explainer-style. Use when the user hands over a script or topic for a video, says "make a video from this script", or wants a long (5–20 min) explainer; read it before the style skills.
-argument-hint: "[script file or topic] [length] [16:9 | 9:16]"
+description: Run a whole explainer video from the user's script to an upload-ready MP4 — beat map, story arc, pacing check, style check, scene build, draft render, final render, mix and delivery — with approval gates so nothing expensive is rendered before the user has agreed. Uses the bundled engine (script.txt → voice → music → render) and flat-explainer-style. Use when the user hands over a script or topic for a video, says "make a video from this script", or wants a long (5–20 min) explainer, a short promo or a trailer; read it before the style skills.
+argument-hint: "[script file or topic] [length]"
 ---
 
 # Video director: script → beat map → gates → film
@@ -82,7 +82,8 @@ Triggered by "autopilot", "don't ask me", "I'll come back when it's done" or sim
 ## The workflow (always in this order)
 
 ### 0. Intake — ask once, then work
-Ask only what isn't given: script (or topic), target length, 16:9 or 9:16, voice (a Kokoro voice or the user's own
+Ask only what isn't given: script (or topic), target length (v0.1 renders 16:9 only; if the user wants vertical 9:16,
+say it isn't supported yet), voice (a Kokoro voice or the user's own
 recording), must-show items (logos, charts, photos). Save the answers to `src/<id>/brief.md`.
 
 ### 1. Script → beat map
@@ -151,6 +152,12 @@ before any video render.
 `render-film.mjs <id> <Comp>` → `out/<id>-upload.mp4`. Checks before sending: no blank frames (luma std-dev per 5 s,
 scan at 10 fps — a 2 fps scan misses short dropouts), duration = audio, −14 LUFS ±1, captions inside the safe area,
 every CREDITS.md entry present.
+
+## When something goes wrong
+Fix what you can and say what you changed. If it's a bug in the plugin itself (a tool crashes, a template draws wrong,
+setup fails on a clean machine), tell the user they can report it at
+https://github.com/mdhassan91/explainer-director/issues/new/choose (the bug form asks for the step, the error text and
+their system). Suggestions and feature ideas go there too.
 
 ## Render lessons (measured)
 - Long renders: render in chapters or 600-frame segments with a fresh browser each — avoids GPU out-of-memory blank

@@ -51,6 +51,28 @@ Then ask Claude: "make a video from this script". On the first run it copies the
 Inside your copy of the engine: `bash tests/selftest.sh` (about a minute, no downloads): beats and cue check on
 the example, unsafe names refused, the ElevenLabs path against a fake local server, and one rendered frame.
 
+## Known limitations (v0.1)
+- **16:9 only** (1920×1080). Vertical 9:16 for Shorts and Reels isn't supported yet.
+- **English narration.** Kokoro voices run with US-English pronunciation; ElevenLabs voices follow its model.
+- **Tested on Linux** (Ubuntu). macOS should work but hasn't been tested yet; on Windows use WSL, because setup
+  and the helper scripts are bash.
+- The first setup downloads about 330 MB (the Kokoro voice model). Render speed depends on your machine: the 71-second
+  example drafts in about 1–2 minutes on a laptop with a 4 GB GPU.
+
+## Updating
+Third-party plugins don't auto-update by default. To get the latest version:
+```
+/plugin marketplace update explainer-director
+```
+or turn on auto-update for it in `/plugin` → **Marketplaces**.
+
+## Feedback
+This is an early release, and feedback shapes what comes next.
+- **Something broke, or you want a feature:** [open an issue](https://github.com/mdhassan91/explainer-director/issues/new/choose)
+  (there's a short form for bugs, feature requests and showing your video).
+- **Questions and ideas:** [Discussions](https://github.com/mdhassan91/explainer-director/discussions).
+- **Made a video with it?** Please share it, I'd love to see it.
+
 ## Coming later
 - **Characters**: a painted character kit for story-driven films with recurring cast members.
 - **3D**: stylized 3D scenes alongside the flat 2D look.

@@ -1,0 +1,39 @@
+name: Bug report
+description: Something broke or gave the wrong result
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! The more of this you fill in, the faster it gets fixed.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you asked Claude for, what you expected, and what you got instead.
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Error message or output
+      description: Paste the error text, or the last lines Claude showed. Remove any API keys first.
+      render: text
+  - type: dropdown
+    id: step
+    attributes:
+      label: Which step failed?
+      options: [Install, setup.sh, beat map / check, voice, music / mix, draft render, final render, other / not sure]
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Your system
+      description: OS, GPU (if any), Node and Python versions. Example — Ubuntu 24.04, GTX 1650 4 GB, Node 22, Python 3.12
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: From `claude plugin list` (for example 0.1.1)

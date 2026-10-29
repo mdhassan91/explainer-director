@@ -1,0 +1,22 @@
+name: Show your video
+description: Share something you made with Explainer Director
+labels: [showcase]
+body:
+  - type: input
+    id: link
+    attributes:
+      label: Link to the video
+      description: YouTube, LinkedIn, Vimeo, or drag the file into the box below.
+  - type: textarea
+    id: about
+    attributes:
+      label: What is it, and how did it go?
+      description: What it's about, how long it took, and what worked well or badly. Feel free to paste your script.txt.
+    validations:
+      required: true
+  - type: checkboxes
+    id: ok
+    attributes:
+      label: Permission
+      options:
+        - label: It's OK to feature this video in the README or a post (with credit to you)

@@ -2,7 +2,7 @@
   "name": "explainer-director",
   "displayName": "Explainer Director",
   "description": "Script to narrated, animated video: long explainers (5–20 min) or 45-second promos. Beat map, approval gates, 17 scene templates, word-synced voices and music, renders on a 4 GB GPU.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Mohammad Hassan"
   },
