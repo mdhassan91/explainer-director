@@ -8,7 +8,7 @@ import { useLibFonts, Ctx } from "./film";
 import { Floor } from "./backdrops";
 
 const Title: React.FC<{ t: string; sub: string }> = ({ t, sub }) => <div style={{ position: "absolute", left: 60, top: 30, fontFamily: FONT, fontSize: 64, color: P.gold, letterSpacing: 4 }}>{t}<span style={{ fontSize: 30, color: P.bone, marginLeft: 24, fontFamily: "Archivo", letterSpacing: 2 }}>{sub}</span></div>;
-const fakeCtx = (era: Era): Ctx => ({ t: 1, id: "cat", s0: 0, s1: 10, lt: 1, L: LOOK[era], era, lines: [], beat: {}, W: () => 0, talk: () => 0, line: () => ({ who: "", start: 0, end: 0, words: [], text: "" }), k: () => 1 });
+const fakeCtx = (era: Era): Ctx => ({ t: 1, id: "cat", s0: 0, s1: 10, lt: 1, L: LOOK[era], era, lines: [], beat: {}, film: { chapters: [] }, W: () => 0, talk: () => 0, line: () => ({ who: "", start: 0, end: 0, words: [], text: "" }), k: () => 1 });
 
 export const LibCatalog: React.FC = () => {
   useLibFonts(); const f = useCurrentFrame(); const L = LOOK.jade;

@@ -2,11 +2,14 @@
 # LIBRARY · synthesized score (royalty-free) + SFX on word cues + voice -> public/<id>/mix.wav.   usage: python tools/mix.py <id>
 # Driven by src/<id>/sound.json:
 #   {"bpm": 84,
-#    "sections": [{"at": "0" | "card:ch1" | "b04" | "b44:lehman" | "b44:six#2" | "b53:blade-0.4", "mood": "tense", "chords": ["Am","F","C","G"]}],
+#    "sections": [{"at": "0" | "card:ch1" | "b04" | "b44:lehman" | "b44:six#2" | "b53:blade-0.4", "mood": "tense", "chords": ["Am","F","C","G"], "gain": 1.0}],
+#                 gain = music level in that section (e.g. 2.0 for a music-only montage that should hit hardest)
 #    "final": "b74:cornerstone",          sustained major chord (optional)
 #    "drama": ["b07"],                     whoosh entering/leaving dialogue (dialogue-template beats are added automatically)
-#    "hits": ["b13:hated"], "chimes": ["b02:batteries"], "pops": ["b06:inheritance"], "risers": ["b52:five"]}
-# Moods: breath title sparse warm uneasy hopeful drive fight rise tense crash dark reflect lift triumph end
+#    "hits": ["b13:hated"], "chimes": ["b02:batteries"], "pops": ["b06:inheritance"], "risers": ["b52:five"],
+#    "rhythm": [{"at": "b02+0.2", "every": 0.909, "n": 12, "sfx": "pop", "vol": 0.3}]}   a sound on every cut of a montage
+# Moods: breath title sparse warm uneasy hopeful drive fight rise tense crash dark reflect lift triumph end silence
+#   (silence = the music stops: a drop before a reveal; sound effects still play)
 # Memory-safe for 20-min films on 7 GB (float32, mono voice, cumsum envelope). SFX from public/lib/sfx.
 import json, os, math, re, subprocess, sys
 import numpy as np, soundfile as sf
@@ -33,6 +36,7 @@ MOODS = {  # pad, arp, density, bass, pulse
  "uneasy": (0.45, 0.35, 1, 0.25, 0.0), "hopeful": (0.55, 0.6, 2, 0.4, 0.3), "drive": (0.5, 0.55, 2, 0.5, 0.5), "fight": (0.55, 0.45, 2, 0.5, 0.7),
  "rise": (0.55, 0.6, 2, 0.5, 0.4), "tense": (0.5, 0.45, 2, 0.5, 0.6), "crash": (0.65, 0.2, 1, 0.5, 0.8), "dark": (0.55, 0.3, 1, 0.5, 0.8),
  "reflect": (0.5, 0.35, 1, 0.3, 0.3), "lift": (0.8, 0.5, 2, 0.4, 0.0), "triumph": (0.7, 0.75, 2, 0.6, 0.6), "end": (0.8, 0.5, 2, 0.5, 0.0),
+ "silence": (0.0, 0.0, 1, 0.0, 0.0),
 }
 SECT = sorted([(when(s["at"]), s["chords"], *MOODS[s["mood"]]) for s in SND["sections"]], key=lambda x: x[0])
 NOTE = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
@@ -66,6 +70,7 @@ for i, s in enumerate(SECT):
     while x < s1: events.append((x, min(x + BAR, s1), chord(s[1][k % len(s[1])]), s)); x += BAR; k += 1
 for (x0, x1, tones, s) in events:
     _, _, padA, arpA, dens, bassA, pulse = s; i0 = int(x0 * SR); dur = x1 - x0
+    if padA == arpA == bassA == pulse == 0: continue
     for j, tn in enumerate(tones): add(i0, 0.045 * padA * pad_tone(hz(48 + tn + (12 if j == 0 else 0)), dur), (j - 1) * 0.5)
     if bassA > 0:
         for b in range(4 if pulse > 0.5 else 2):
@@ -90,6 +95,9 @@ if SND.get("final"):
     fz = when(SND["final"])
     for j, tn in enumerate([0, 4, 7, 12, 16]): add(int(fz * SR), 0.11 * piano(hz(60 + tn), 7.0), (j - 2) * 0.3)
 music = np.stack([L_, R_], 1); del L_, R_
+GS = sorted([(when(x["at"]), float(x.get("gain", 1.0))) for x in SND["sections"]])
+for i, (g0, g) in enumerate(GS):
+    if g != 1.0: music[int(g0 * SR): int(GS[i + 1][0] * SR) if i + 1 < len(GS) else N] *= g
 for d, g in ((0.031, 0.35), (0.067, 0.28), (0.113, 0.22), (0.171, 0.16), (0.257, 0.11)):
     k = int(d * SR); music[k:, 0] += g * music[:-k, 1]; music[k:, 1] += g * music[:-k, 0]
 for a in range(0, N, SR * 30):
@@ -122,6 +130,9 @@ for s in SND.get("hits", []): fx("impact-bass-1", when(s) - 0.05, 0.5)
 for s in SND.get("chimes", []): fx("chime", when(s) - 0.05, 0.35)
 for s in SND.get("risers", []): fx("riser", when(s) - 2.0, 0.3)
 for i, s in enumerate(SND.get("pops", [])): fx("pop", when(s) - 0.05, 0.28, ((i % 5) - 2) / 4)
+for r in SND.get("rhythm", []):
+    if r.get("sfx", "pop") not in S: sys.exit(f"sound.json rhythm: unknown sfx {r.get('sfx')} (use {', '.join(S)})")
+    for k in range(int(r["n"])): fx(r.get("sfx", "pop"), when(r["at"]) + k * float(r["every"]) - 0.03, float(r.get("vol", 0.3)), ((k % 5) - 2) / 5)
 music *= 0.5; music += 0.5 * sfx; del sfx; music += vv[:, None]; del vv
 music /= max(1e-6, float(np.abs(music).max())) / 0.95
 sf.write(f"{ROOT}/public/{pid}/mix.wav", music, SR, subtype="PCM_16")

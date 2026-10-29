@@ -25,7 +25,7 @@ chs.forEach((c, i) => { c.a = Math.round(c.t * fps); c.b = i + 1 < chs.length ? 
 // hashing
 const H = (...xs) => crypto.createHash("sha1").update(xs.join("\u0000")).digest("hex").slice(0, 10);
 const libHash = H(...fs.readdirSync("src/lib").sort().map((f) => read(`src/lib/${f}`)));
-const projFiles = fs.readdirSync(P).filter((f) => /\.(tsx?|json)$/.test(f) && !["scenes.tsx", "lines.json", "beats.json", "beats.md"].includes(f)).sort();
+const projFiles = fs.readdirSync(P).filter((f) => /\.(tsx?|json)$/.test(f) && !["scenes.tsx", "lines.json", "beats.json", "beats.md", "sound.json"].includes(f)).sort();
 const projHash = H(...projFiles.map((f) => read(`${P}/${f}`)), read("src/Root.tsx"));
 const scenesSrc = fs.existsSync(`${P}/scenes.tsx`) ? read(`${P}/scenes.tsx`) : "";
 const parts = scenesSrc.split(/\n  (b\d+): \(c\) =>/); const sceneOf = {}; for (let i = 1; i < parts.length; i += 2) sceneOf[parts[i]] = parts[i + 1];

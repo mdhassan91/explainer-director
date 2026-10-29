@@ -87,6 +87,7 @@ def beat_audio(b):
     parts, t, lines = [], 0.0, []
     def sil(s):
         nonlocal t; parts.append(np.zeros(int(s * SR), np.float32)); t += s
+    if b.get("lead"): sil(b["lead"])
     for li, L in enumerate(b["lines"]):
         if li: sil(GAP_LINE)
         ls, words = t, []
@@ -97,6 +98,7 @@ def beat_audio(b):
             parts.append(a); t += len(a) / SR
             if pi < len(phrases) - 1: sil(PAUSE.get(ph[-1], 0.08))
         lines.append({"who": L["who"], "start": ls, "end": t, "words": words})
+    if b.get("hold") or not parts: sil(b.get("hold") or 1.0)   # music-only time (a beat with nothing at all holds 1 s)
     return np.concatenate(parts), lines
 if __name__ == "__main__":
     B = json.load(open(f"{ROOT}/src/{pid}/beats.json"))
@@ -118,14 +120,15 @@ if __name__ == "__main__":
     for (ch, b), (a, lines) in zip(flat, res, strict=True):
         if ch["id"] not in seen:
             seen.add(ch["id"])
-            if ch["id"] != first_ch: cards.append({"id": ch["id"], "title": ch["title"], "year": ch["year"], "start": round(t, 3), "end": round(t + CARD, 3)}); out.append(np.zeros(int(CARD * SR), np.float32)); t += CARD
+            cd = ch.get("card", CARD)
+            if ch["id"] != first_ch and cd > 0: cards.append({"id": ch["id"], "title": ch["title"], "year": ch["year"], "start": round(t, 3), "end": round(t + cd, 3)}); out.append(np.zeros(int(cd * SR), np.float32)); t += cd
         beats.append({"id": b["id"], "chapter": ch["id"], "start": round(t, 3), "end": round(t + len(a) / SR, 3), "lines": [sh(L, t) for L in lines]})
         out.append(a); t += len(a) / SR
         g = GAP_BEAT
-        if b["id"] == last_open and first_ch == "ch0" and len(B["chapters"]) > 1:
+        if b["id"] == last_open and first_ch == "ch0" and len(B["chapters"]) > 1 and B.get("titleCard", True):
             cards.append({"id": "title", "title": B.get("title", ""), "year": "", "start": round(t + 0.5, 3), "end": round(t + 0.5 + TITLE, 3)}); g = TITLE + 0.5
         out.append(np.zeros(int(g * SR), np.float32)); t += g
-    out.append(np.zeros(int(TAIL * SR), np.float32)); t += TAIL
+    tail = B.get("tail", TAIL); out.append(np.zeros(int(tail * SR), np.float32)); t += tail
     audio = np.concatenate(out); audio = audio / max(1e-6, np.abs(audio).max()) * 0.89
     os.makedirs(f"{ROOT}/public/{pid}", exist_ok=True)
     sf.write(f"{ROOT}/public/{pid}/voice.wav", audio, SR, subtype="PCM_16")

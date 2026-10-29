@@ -27,7 +27,9 @@ This skill decides the order of work. Everything it needs ships with this plugin
 ## Templates first
 Most beats need no code. Before writing a scene, check the templates in `engine/src/lib/templates.tsx`
 (render `LibCatalog` for a contact sheet): **kinetic, bigNumber, bars, priceCompare, icons, map, split, process, quote,
-hero, city, dialogue**. Hand-write a scene in `src/<id>/scenes.tsx` only when no template fits; a hand-written scene
+hero, city, dialogue**, plus five for promos and trailers: **terminal** (types a command), **montage** (one template per
+cut, on the music), **glitch** (a frozen frame breaks up: the fake-out before a reveal), **scriptReveal** (the film's own
+script.txt, the spoken line lit word by word) and **black** (hard-cut ending). Hand-write a scene in `src/<id>/scenes.tsx` only when no template fits; a hand-written scene
 used twice becomes a template (add it to `src/lib/templates.tsx`).
 
 ## The film pipeline (one folder per video: `src/<id>/`)
@@ -50,12 +52,21 @@ node tools/render-film.mjs <id> <Comp>             # final: out/<id>-upload.mp4 
 & map {"view":"world","pins":[...]}        optional: build this beat from a template
 N: narrator text                           lines; speakers + voices in cast.json (N = narrator)
 LEAD: dialogue text
+~ 1.5                                      silence: before the lines = lead-in, after = hold (a beat may have no lines)
 ```
+Add `| card 0` to a chapter line to drop its chapter card; `meta.json` `"titleCard": false, "tail": 0.3` for a hard ending.
 Template cue words (`"on": "word"`) must be words actually spoken in that beat — `check.py` enforces it.
 
 **Speed rules (measured):** grain is added in the ffmpeg finish, not the browser (27 % faster frames); render by chapter
 with the cache (a fix re-renders one chapter); NVENC encode when an NVIDIA GPU is there, x264 otherwise; voice with 1
 worker (Kokoro already uses all cores); ≤ 3 render workers; review with the stills sampler before any draft video.
+
+## Short promos and trailers (30–60 s)
+A different shape from the long explainer: no chapter cards (`card 0`), ~1 new thing on screen every 0.5–1 s, few words,
+music carries it. Formula: **trigger** in the first second (a `terminal` command, a button, a question) → **montage** cut on
+the music (`sound.json` `rhythm` for a pop per cut, section `"gain": 2` so music-only stretches hit hardest) → short
+**proof** lines → **fake-out** (`glitch` + a `"silence"` section) → **reveal** → title, then a **hard cut to black**.
+The bundled engine's README demo was made this way (`docs/promo/` in the repository).
 
 ## Autopilot mode (user pastes a script and leaves)
 Triggered by "autopilot", "don't ask me", "I'll come back when it's done" or similar. Run every step without stopping:

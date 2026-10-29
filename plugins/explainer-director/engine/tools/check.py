@@ -29,7 +29,7 @@ for bid, b in beats.items():
         if toks[bid].count(norm(w)) < int(n or 1): bad.append(f"{bid}: template cue '{on}' not spoken")
 if os.path.exists(f"{P}/sound.json"):
     S = json.load(open(f"{P}/sound.json"))
-    for s in [x["at"] for x in S.get("sections", [])] + S.get("hits", []) + S.get("chimes", []) + S.get("pops", []) + S.get("risers", []) + ([S["final"]] if S.get("final") else []):
+    for s in [x["at"] for x in S.get("sections", [])] + S.get("hits", []) + S.get("chimes", []) + S.get("pops", []) + S.get("risers", []) + [r["at"] for r in S.get("rhythm", [])] + ([S["final"]] if S.get("final") else []):
         base = re.sub(r"[+-]\d+(\.\d+)?$", "", s)
         if ":" in base and not base.startswith("card:"):
             bid, w = base.split(":"); w, _, n = w.partition("#")

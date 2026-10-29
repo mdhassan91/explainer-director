@@ -1,0 +1,92 @@
+{
+ "bpm": 132,
+ "sections": [
+  {
+   "at": "0",
+   "mood": "sparse",
+   "chords": [
+    "Am",
+    "F",
+    "C",
+    "G"
+   ]
+  },
+  {
+   "at": "b02",
+   "mood": "drive",
+   "chords": [
+    "Am",
+    "F",
+    "C",
+    "G"
+   ],
+   "gain": 2.2
+  },
+  {
+   "at": "b03",
+   "mood": "tense",
+   "chords": [
+    "Dm",
+    "Bb",
+    "F",
+    "C"
+   ]
+  },
+  {
+   "at": "b06+0.35",
+   "mood": "silence",
+   "chords": [
+    "Am"
+   ]
+  },
+  {
+   "at": "b07",
+   "mood": "breath",
+   "chords": [
+    "Am",
+    "F"
+   ]
+  },
+  {
+   "at": "b08",
+   "mood": "triumph",
+   "chords": [
+    "C",
+    "G",
+    "Am",
+    "F"
+   ],
+   "gain": 1.4
+  },
+  {
+   "at": "b09",
+   "mood": "silence",
+   "chords": [
+    "C"
+   ]
+  }
+ ],
+ "hits": [
+  "b02",
+  "b05:cue",
+  "b08:explainer"
+ ],
+ "chimes": [
+  "b07:file"
+ ],
+ "pops": [
+  "b01+0.35"
+ ],
+ "risers": [
+  "b08:explainer"
+ ],
+ "rhythm": [
+  {
+   "at": "b02+0.909",
+   "every": 0.909,
+   "n": 11,
+   "sfx": "pop",
+   "vol": 0.32
+  }
+ ]
+}

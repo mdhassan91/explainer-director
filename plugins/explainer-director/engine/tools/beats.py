@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """LIBRARY · script.txt -> beats.json + beats.md.   usage: python tools/beats.py <id>   (project = src/<id>/)
 script.txt format:
-  # ch1 | THE ORPHAN | 1966 | sepia            chapter: id | title | year | grade (sepia|cool2000|jade|now|cream)
+  # ch1 | THE ORPHAN | 1966 | sepia            chapter: id | title | year | grade (sepia|cool2000|jade|now|cream) [| card 0]
+                                               "card 0" = no chapter card (fast promos), "card 2" = a 2-second card
   = b04 | MAP | what's on screen               beat: id | kind | visual note
   & map {"view":"china","pins":[...]}          optional: build this beat from a library template (src/lib/templates.tsx)
   @ B&W rural fields                           optional: real B-roll wanted
+  ~ 2.5                                        optional: 2.5 s with no voice — before the lines = a lead-in, after = a hold
+                                               (a beat may have no lines at all: montages, fake-outs, a black ending)
   N: narrator text / LEAD: dialogue text       lines; speakers + voices in src/<id>/cast.json
 """
 import json, sys, pathlib
@@ -17,27 +20,32 @@ for raw in (P / "script.txt").read_text().splitlines():
     line = raw.strip()
     if not line: continue
     if line.startswith("# "):
-        cid, title, year, grade = [s.strip() for s in line[2:].split("|")]
+        f = [s.strip() for s in line[2:].split("|")]; cid, title, year, grade = f[:4]
         cur = {"id": cid, "title": title, "year": year, "grade": grade, "beats": []}; chapters.append(cur)
+        for opt in f[4:]:
+            k, _, v = opt.partition(" ")
+            if k != "card": sys.exit(f"unknown chapter option '{opt}' in: {line}")
+            cur["card"] = float(v)
     elif line.startswith("= "):
         bid, kind, vis = [s.strip() for s in line[2:].split("|", 2)]
         beat = {"id": bid, "kind": kind, "visual": vis, "lines": [], "broll": None}; cur["beats"].append(beat)
     elif line.startswith("& "):
         name, _, args = line[2:].partition(" "); beat["template"] = name.strip(); beat["args"] = json.loads(args) if args.strip() else {}
     elif line.startswith("@ "): beat["broll"] = line[2:].strip()
+    elif line.startswith("~ "): beat["hold" if beat["lines"] else "lead"] = float(line[2:])
     else:
         who, text = line.split(":", 1); who = who.strip()
         if who not in CAST: sys.exit(f"speaker {who} missing from cast.json")
         beat["lines"].append({"who": who, "voice": CAST[who], "text": text.strip()})
 t, words_total = 0.0, 0
 for ch in chapters:
-    if ch["id"] != "ch0": ch["card_start"] = round(t, 1); t += CARD
+    if ch["id"] != "ch0" and ch.get("card", CARD) > 0: ch["card_start"] = round(t, 1); t += ch.get("card", CARD)
     for b in ch["beats"]:
         w = sum(len(l["text"].split()) for l in b["lines"]); words_total += w
-        d = w / WPS + GAP * (len(b["lines"]) - 1) + 0.5
+        d = w / WPS + GAP * max(0, len(b["lines"]) - 1) + b.get("lead", 0) + b.get("hold", 0) + 0.5
         b.update(est_start=round(t, 1), est_dur=round(d, 1), words=w); t += d
 meta = json.loads((P / "meta.json").read_text()) if (P / "meta.json").exists() else {}
-(P / "beats.json").write_text(json.dumps({"title": meta.get("title", pid), "fps": meta.get("fps", 24), "cast": CAST, "chapters": chapters}, indent=1))
+(P / "beats.json").write_text(json.dumps({"title": meta.get("title", pid), "fps": meta.get("fps", 24), "titleCard": meta.get("titleCard", True), "tail": meta.get("tail", 5.0), "cast": CAST, "chapters": chapters}, indent=1))
 mm = lambda s: f"{int(s // 60)}:{int(s % 60):02d}"
 md = [f"# {meta.get('title', pid)} — beat map\n\n{words_total} words · est. **{mm(t)}**\n"]
 for ch in chapters:

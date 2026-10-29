@@ -8,7 +8,7 @@ import { TEMPLATES } from "./templates";
 
 export type LineT = { who: string; start: number; end: number; words: { t: string; s: number; e: number }[]; text: string };
 export type Ctx = {
-  t: number; id: string; s0: number; s1: number; lt: number; L: Look; era: Era; lines: LineT[]; beat: any;
+  t: number; id: string; s0: number; s1: number; lt: number; L: Look; era: Era; lines: LineT[]; beat: any; film: any;
   W: (word: string, n?: number) => number; talk: (who: string) => number; line: (who: string, n?: number) => LineT; k: (a: number, d?: number) => number;
 };
 export type SceneFn = (c: Ctx) => React.ReactNode;
@@ -41,14 +41,14 @@ export function makeFilm(o: FilmOpts) {
     return out;
   })();
   const NUM: Record<string, string> = {}; CH.filter((c) => c.id !== "ch0").forEach((c, i) => (NUM[c.id] = `#${i + 1}`));
-  const flashes = SEGS.filter((s, j) => s.kind === "card" || SEGS[j - 1]?.kind === "card" || drama.has(s.id) !== drama.has(SEGS[j - 1]?.id ?? "")).map((s) => s.a);
+  const flashes = SEGS.filter((s, j) => s.kind === "card" || (s.kind === "beat" && s.def?.args?.flashIn) || SEGS[j - 1]?.kind === "card" || drama.has(s.id) !== drama.has(SEGS[j - 1]?.id ?? "")).map((s) => s.a);
 
   const makeCtx = (seg: Seg, t: number): Ctx => {
     const lines: LineT[] = seg.beat.lines; const L = LOOK[seg.era];
     const W = (word: string, n = 1) => { let k = 0; for (const l of lines) for (const w of l.words) if (norm(w.t) === norm(word) && ++k === n) return w.s; throw new Error(`[${seg.id}] word not found: ${word} #${n}`); };
     const talk = (who: string) => { let v = 0; for (const l of lines) if (l.who === who) v = Math.max(v, Math.min(ramp(t, l.start - 0.05, 0.1), 1 - ramp(t, l.end - 0.05, 0.12))); return v; };
     const line = (who: string, n = 1) => { let k = 0; for (const l of lines) if (l.who === who && ++k === n) return l; throw new Error(`[${seg.id}] no line ${who} #${n}`); };
-    return { t, id: seg.id, s0: seg.a, s1: seg.b, lt: t - seg.a, L, era: seg.era, lines, beat: seg.def, W, talk, line, k: (a, d = 0.4) => ease(ramp(t, a, d)) };
+    return { t, id: seg.id, s0: seg.a, s1: seg.b, lt: t - seg.a, L, era: seg.era, lines, beat: seg.def, film: o.beats, W, talk, line, k: (a, d = 0.4) => ease(ramp(t, a, d)) };
   };
 
   const Film: React.FC<{ at?: number }> = ({ at }) => {

@@ -8,7 +8,7 @@
     {
       "name": "explainer-director",
       "source": "./plugins/explainer-director",
-      "description": "Script to long-form animated explainer (5–20 min): beat map, approval gates, 12 scene templates, word-synced voices and music, renders on a 4 GB GPU."
+      "description": "Script to narrated, animated video: long explainers (5–20 min) or 45-second promos. Beat map, approval gates, 17 scene templates, word-synced voices and music, renders on a 4 GB GPU."
     }
   ]
 }

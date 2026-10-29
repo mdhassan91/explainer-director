@@ -2,7 +2,9 @@
 
 Turn a script into a **narrated, scored, animated explainer video** with Claude Code, on your own machine.
 You approve the beat map, the look and a draft before the final render. Built for long videos (5–20 min):
-training and e-learning explainers, lesson-by-lesson summaries, business-history stories.
+training and e-learning explainers, lesson-by-lesson summaries, business-history stories, and for short promos and trailers.
+
+The 44-second promo below was made with it from one text file: [docs/promo/script.txt](docs/promo/script.txt).
 
 ![frames from the bundled example](docs/example-frames.jpg)
 
@@ -12,8 +14,9 @@ training and e-learning explainers, lesson-by-lesson summaries, business-history
 - **video-director** skill: intake → beat map (gate 1) → look check (gate 2) → voice + music → draft (gate 3) → final,
   with story arcs, pacing rules and a long-form story formula.
 - **flat-explainer-style** skill: the calm numbered-lesson look (cream + deep teal, icons on cue, chapter cards).
-- **engine/**: a Remotion project you copy into your folder. Write `script.txt`; most beats are templates
-  (kinetic words, big numbers, bars, maps, process lines, split screens, quotes, dialogue, …), so no scene code.
+- **engine/**: a Remotion project you copy into your folder. Write `script.txt`; most beats are one of 17 templates
+  (kinetic words, big numbers, bars, maps, process lines, split screens, quotes, dialogue, …, plus terminal, montage,
+  glitch, script reveal and black for promos), so no scene code.
   - Kokoro voices (free, offline, multi-voice) by default, or ElevenLabs per speaker with your own API key
     (`"elevenlabs:<voice_id>"` in cast.json, `ELEVENLABS_API_KEY` set) — word timings either way, so every pop lands on the spoken word
   - Synthesized, royalty-free score with moods per chapter, sound effects on cue words

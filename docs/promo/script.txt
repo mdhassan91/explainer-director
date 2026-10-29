@@ -1,0 +1,42 @@
+# ch0 | TRIGGER | today | now
+= b01 | TERMINAL | one command starts it all
+& terminal {"title":"claude","lines":[{"on":0.35,"text":"make a video from script.txt"},{"on":1.75,"kind":"ok","text":"beat map · voices · music"},{"on":2.2,"kind":"out","text":"rendering…"}],"burst":2.95}
+~ 2.9
+
+# ch1 | MONTAGE | today | now | card 0
+= b02 | MONTAGE | the twelve templates, one per cut
+& montage {"every":0.909,"items":[{"template":"kinetic","grade":"now","label":"WORDS","args":{"align":"center","top":330,"items":[{"on":0.02,"text":"KINETIC TYPE","color":"glow","size":190},{"on":0.3,"text":"ON CUE","as":"stamp","size":130}]}},{"template":"bigNumber","grade":"cool2000","label":"NUMBERS","args":{"on":0.0,"to":99441,"dur":0.6,"label":"COUNTERS"}},{"template":"bars","grade":"jade","label":"BARS","args":{"max":100,"items":[{"label":"A","v":35,"on":0.0,"txt":""},{"label":"B","v":90,"on":0.12,"txt":""},{"label":"C","v":60,"on":0.24,"txt":""}]}},{"template":"priceCompare","grade":"sepia","label":"PRICES","args":{"left":{"label":"BEFORE","price":"$9.99","on":0.0},"right":{"label":"AFTER","price":"$4.99","on":0.2}}},{"template":"map","grade":"now","label":"MAPS","args":{"view":"world","pins":[{"place":"london","on":0.0,"label":"LONDON"},{"place":"singapore","on":0.15,"label":"SINGAPORE"},{"place":"sanfrancisco","on":0.3,"label":"SAN FRANCISCO"}]}},{"template":"dialogue","grade":"cool2000","label":"DIALOGUE","args":{"set":"office","left":{"who":"DEV","shirt":"jade","hair":"side"},"right":{"who":"LEAD","shirt":"#6D6455","glasses":true}}},{"template":"process","grade":"jade","label":"PROCESS","args":{"steps":["IDEA","SCRIPT","VOICE","FILM"]}},{"template":"icons","grade":"cream","label":"ICONS","args":{"icons":[{"name":"brain","on":0.0},{"name":"globe","on":0.12},{"name":"shield","on":0.24}]}},{"template":"split","grade":"now","label":"SPLIT SCREEN","args":{"left":{"title":"BEFORE","on":0.0,"icon":"cross"},"right":{"title":"AFTER","on":0.2,"icon":"check"}}},{"template":"quote","grade":"sepia","label":"QUOTES","args":{"text":"One idea per beat.","on":0.0}},{"template":"hero","grade":"jade","label":"HERO SHOT","args":{"icon":"doc","on":0.0}},{"template":"city","grade":"cream","label":"CITIES","args":{"title":{"on":0.05,"text":"ANY CITY, ANY ERA"}}}]}
+~ 11.2
+
+# ch2 | PROOF | today | cool2000 | card 0
+= b03 | MAP | pins land on the word
+& map {"view":"world","pins":[{"place":"london","on":"london","label":"LONDON"},{"place":"singapore","on":"singapore","label":"SINGAPORE"},{"place":"sanfrancisco","on":"francisco","label":"SAN FRANCISCO"}]}
+N: Pins land on the word. London. Singapore. San Francisco.
+= b04 | DIALOGUE | the setup line
+& dialogue {"set":"studio","left":{"who":"DEV","shirt":"jade","hair":"side"},"right":{"who":"LEAD","shirt":"#6D6455","glasses":true}}
+LEAD: Who animated this?
+DEV: Nobody. It's a text file.
+= b05 | KINETIC | sound on cue
+& kinetic {"align":"center","top":250,"items":[{"on":"voices","text":"VOICES","color":"glow","size":170},{"on":"music","text":"MUSIC","size":170},{"on":"cue","text":"ON CUE","size":150,"as":"stamp"}]}
+N: Voices, music, and every sound effect, right on cue.
+
+# ch3 | FAKE OUT | today | now | card 0
+= b06 | GLITCH | the film breaks
+& glitch {"of":{"template":"kinetic","grade":"cool2000","args":{"align":"center","top":250,"items":[{"on":0,"text":"VOICES","color":"glow","size":170},{"on":0,"text":"MUSIC","size":170},{"on":0,"text":"ON CUE","size":150,"as":"stamp"}]}},"start":0.35,"dur":1.3}
+~ 1.9
+
+# ch4 | THE FILE | today | now | card 0
+= b07 | SCRIPT | the reveal: this video is this file
+& scriptReveal {"scroll":1.5}
+~ 1.6
+N: Every frame you just saw is this text file.
+~ 0.8
+
+# ch5 | TITLE | today | cream | card 0
+= b08 | KINETIC | the name
+& kinetic {"align":"center","top":250,"flashIn":true,"items":[{"on":"explainer","text":"EXPLAINER DIRECTOR","color":"ink","size":180},{"on":"claude","text":"A CLAUDE CODE PLUGIN","size":80,"as":"tape"},{"on":"yours","text":"WRITE YOURS","size":130,"color":"danger"}]}
+N: Explainer Director. A Claude Code plugin. Write yours.
+~ 1.2
+= b09 | BLACK | hard cut
+& black {}
+~ 1.4
