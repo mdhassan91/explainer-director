@@ -6,6 +6,12 @@ training and e-learning explainers, lesson-by-lesson summaries, business-history
 
 The 44-second promo below was made with it from one text file: [docs/promo/script.txt](docs/promo/script.txt).
 
+
+
+https://github.com/user-attachments/assets/ec82a5fa-5a74-48bc-b3f5-11fe46b3f5b3
+
+
+
 ![frames from the bundled example](docs/example-frames.jpg)
 
 > Status: v0.1, first public release.
