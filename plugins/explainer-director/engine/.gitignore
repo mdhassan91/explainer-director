@@ -4,3 +4,4 @@ build-*/
 public/*/voice.wav
 public/*/mix.wav
 public/lib/sfx/
+public/*/.tts-cache/

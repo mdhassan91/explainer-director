@@ -119,7 +119,13 @@ flat-explainer-style (chapter grade `cream`). **GATE 2 — the user picks the lo
   `public/lib/sfx/CREDITS.md`).
 
 ### 4. Voice + timing
-`voice.py` makes one take per line with Kokoro and computes word times (proportional to phonemes, snapped to energy
+Each speaker's voice is set in `cast.json`:
+- a **Kokoro** voice (`"am_michael"`, `"af_heart"`, …) — free, offline, the default;
+- or **ElevenLabs**: `"elevenlabs:<voice_id>"`, optionally `"elevenlabs:<voice_id>@1.1"` for speed (0.7–1.2). Needs
+  `ELEVENLABS_API_KEY` in the environment (ask the user to set it; never write a key into project files). Model:
+  `ELEVENLABS_MODEL` (default `eleven_multilingual_v2`). Takes are cached in `public/<id>/.tts-cache/`, so re-running
+  only pays for changed lines. ElevenLabs bills per character — tell the user the script's character count first.
+Providers can be mixed per speaker. `voice.py` makes one take per line and computes word times (proportional to phonemes, snapped to energy
 dips — no speech-recognition model needed). Fix pronunciation in `say.json` (`{"Nguyen": "Win"}`). For the user's own
 recording, put it at `public/<id>/voice.wav` and write `lines.json` from a transcript.
 

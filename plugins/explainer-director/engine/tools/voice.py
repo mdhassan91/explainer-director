@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""LIBRARY · multi-voice Kokoro voice-over, beat by beat (--workers N exists, but Kokoro already uses every core, so 1 is fastest — measured).
+"""LIBRARY · multi-voice voice-over, beat by beat (--workers N exists, but Kokoro already uses every core, so 1 is fastest — measured).
+Voices (cast.json, per speaker): a Kokoro voice ("am_michael", free, local — the default) or
+"elevenlabs:<voice_id>" (needs ELEVENLABS_API_KEY in the environment; optional "elevenlabs:<voice_id>@1.1" sets the speed,
+0.7–1.2; model from ELEVENLABS_MODEL, default eleven_multilingual_v2). ElevenLabs takes are cached in public/<id>/.tts-cache/,
+so re-running only pays for lines that changed.
 usage: python tools/voice.py <id> [--workers 3] [--narrator-speed 1.15] [--speed 1.1]
 in:  src/<id>/beats.json, optional src/<id>/say.json ({"Nguyen": "Win"} pronunciation fixes)
 out: public/<id>/voice.wav + src/<id>/lines.json {duration, cards:[{id,title,year,start,end}], beats:[{id,chapter,start,end,lines:[{who,start,end,words}]}]}
 Word times inside a phrase ∝ phoneme count, snapped to energy dips (no ASR model needed). Title card goes after the cold open's last beat."""
-import json, os, re, sys
+import hashlib, json, os, re, sys, urllib.error, urllib.request
 from multiprocessing import Pool
 import numpy as np, soundfile as sf
 ROOT = os.environ.get("ED_ROOT") or os.path.dirname(os.path.dirname(os.path.abspath(__file__))); SR = 24000
@@ -19,14 +23,41 @@ GAP_LINE, GAP_BEAT, CARD, TITLE, TAIL = 0.32, 0.5, 5.5, 5.5, 5.0
 K = None
 def init():
     global K
-    import kokoro_onnx; K = kokoro_onnx.Kokoro(MODEL, VOICES)
+    if os.path.exists(MODEL) and os.path.exists(VOICES):
+        import kokoro_onnx; K = kokoro_onnx.Kokoro(MODEL, VOICES)
 strip = lambda w: w.strip(",.?!:;…\"'")
 def phonemes(word):
     w = re.sub(r"[^A-Za-z']", "", SAY.get(strip(word), word))
-    return max(1, len(re.sub(r"[ˈˌː\s]", "", K.tokenizer.phonemize(w.lower(), "en-us")))) if w else 2
+    if not w: return 2
+    if K is None: return max(1, round(len(w) * 0.8))   # no Kokoro model: letters ≈ phonemes
+    return max(1, len(re.sub(r"[ˈˌː\s]", "", K.tokenizer.phonemize(w.lower(), "en-us"))))
+EL_BASE = os.environ.get("ELEVENLABS_API_BASE", "https://api.elevenlabs.io").rstrip("/")
+EL_MODEL = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
+def elevenlabs(say, voice_id, speed):
+    key = os.environ.get("ELEVENLABS_API_KEY")
+    if not key: raise RuntimeError("ELEVENLABS_API_KEY is not set (cast.json asks for an ElevenLabs voice)")
+    body = {"text": say, "model_id": EL_MODEL}
+    if speed is not None: body["voice_settings"] = {"speed": min(1.2, max(0.7, speed))}
+    cdir = f"{ROOT}/public/{pid}/.tts-cache"; os.makedirs(cdir, exist_ok=True)
+    cf = f"{cdir}/el-{hashlib.sha1(json.dumps([voice_id, body], sort_keys=True).encode()).hexdigest()[:16]}.pcm"
+    if not os.path.exists(cf):
+        req = urllib.request.Request(f"{EL_BASE}/v1/text-to-speech/{voice_id}?output_format=pcm_24000", data=json.dumps(body).encode(),
+                                     headers={"xi-api-key": key, "Content-Type": "application/json", "Accept": "audio/pcm"})
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r: pcm = r.read()
+        except urllib.error.HTTPError as e: raise RuntimeError(f"ElevenLabs error {e.code} for voice {voice_id}: {e.read()[:300].decode(errors='replace')}") from None
+        except urllib.error.URLError as e: raise RuntimeError(f"cannot reach ElevenLabs at {EL_BASE}: {e.reason}") from None
+        with open(cf + ".tmp", "wb") as f: f.write(pcm)
+        os.replace(cf + ".tmp", cf)
+    return np.frombuffer(open(cf, "rb").read(), dtype="<i2").astype(np.float32) / 32768.0   # 24 kHz mono = SR
 def synth(text, voice, speed):
     say = " ".join(SAY.get(strip(w), strip(w)) + re.sub(r"^.*?(?=[,.?!:;…]*$)", "", w) for w in text.split())
-    a, _ = K.create(say, voice=voice, speed=speed, lang="en-us", trim=True)
+    if voice.startswith("elevenlabs:"):
+        vid, _, sp = voice[len("elevenlabs:"):].partition("@")
+        a = elevenlabs(say, vid, float(sp) if sp else None)
+    else:
+        if K is None: raise RuntimeError(f"Kokoro model not found in {KDIR} (run setup.sh, or set KOKORO_DIR) — needed for voice {voice}")
+        a, _ = K.create(say, voice=voice, speed=speed, lang="en-us", trim=True)
     idx = np.flatnonzero(np.abs(a) > 10 ** (-45 / 20))
     return (a[max(0, idx[0] - 240): idx[-1] + 480] if len(idx) else a).astype(np.float32)
 def word_times(audio, words):
@@ -56,7 +87,14 @@ def beat_audio(b):
 if __name__ == "__main__":
     B = json.load(open(f"{ROOT}/src/{pid}/beats.json"))
     flat = [(ch, b) for ch in B["chapters"] for b in ch["beats"]]
-    with Pool(WORKERS, initializer=init) as pool: res = pool.map(beat_audio, [b for _, b in flat], chunksize=1)
+    voices = {L["voice"] for _, b in flat for L in b["lines"]}
+    if any(v.startswith("elevenlabs:") for v in voices) and not os.environ.get("ELEVENLABS_API_KEY"):
+        sys.exit("ELEVENLABS_API_KEY is not set, but cast.json uses an ElevenLabs voice")
+    if any(not v.startswith("elevenlabs:") for v in voices) and not (os.path.exists(MODEL) and os.path.exists(VOICES)):
+        sys.exit(f"Kokoro model not found in {KDIR} (run setup.sh, or set KOKORO_DIR)")
+    try:
+        with Pool(WORKERS, initializer=init) as pool: res = pool.map(beat_audio, [b for _, b in flat], chunksize=1)
+    except RuntimeError as e: sys.exit(f"voice failed: {e}")
     out, t, beats, cards = [np.zeros(int(0.6 * SR), np.float32)], 0.6, [], []
     sh = lambda L, o: {**L, "start": round(L["start"] + o, 3), "end": round(L["end"] + o, 3), "words": [{"t": w["t"], "s": round(w["s"] + o, 3), "e": round(w["e"] + o, 3)} for w in L["words"]]}
     seen = set(); first_ch = B["chapters"][0]["id"]; last_open = B["chapters"][0]["beats"][-1]["id"]

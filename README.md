@@ -14,7 +14,8 @@ training and e-learning explainers, lesson-by-lesson summaries, business-history
 - **flat-explainer-style** skill: the calm numbered-lesson look (cream + deep teal, icons on cue, chapter cards).
 - **engine/**: a Remotion project you copy into your folder. Write `script.txt`; most beats are templates
   (kinetic words, big numbers, bars, maps, process lines, split screens, quotes, dialogue, …), so no scene code.
-  - Kokoro voices (offline, multi-voice) with word timings — every pop lands on the spoken word
+  - Kokoro voices (free, offline, multi-voice) by default, or ElevenLabs per speaker with your own API key
+    (`"elevenlabs:<voice_id>"` in cast.json, `ELEVENLABS_API_KEY` set) — word timings either way, so every pop lands on the spoken word
   - Synthesized, royalty-free score with moods per chapter, sound effects on cue words
   - Pre-render check that every cue word is actually spoken
   - Chapter-cached rendering: a fix re-renders one chapter, not the film
