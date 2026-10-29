@@ -9,8 +9,10 @@ import fs from "fs"; import path from "path"; import crypto from "crypto"; impor
 import { fileURLToPath } from "url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); process.chdir(ROOT);
 const A = process.argv.slice(2); const [id, comp] = A; const flag = (k) => A.includes(k); const opt = (k, d) => (A.includes(k) ? A[A.indexOf(k) + 1] : d);
+const SAFE = /^[A-Za-z0-9_-]+$/;
+if (id && comp && (!SAFE.test(id) || !SAFE.test(comp))) { console.log("film id and composition may only use letters, digits, - and _"); process.exit(1); }
 if (!id || !comp) { console.log("usage: node tools/render-film.mjs <id> <Composition> [--draft] [--force] [--only ch2] [--conc 3]"); process.exit(1); }
-const DRAFT = flag("--draft"), FORCE = flag("--force"), ONLY = opt("--only", "").split(",").filter(Boolean), CONC = opt("--conc", "3");
+const DRAFT = flag("--draft"), FORCE = flag("--force"), ONLY = opt("--only", "").split(",").filter(Boolean), CONC = String(parseInt(opt("--conc", "3"), 10) || 3);
 const env = { ...process.env };
 const sh = (c) => execSync(c, { stdio: "inherit", env, shell: "/bin/bash" });
 const P = `src/${id}`; const read = (f) => fs.readFileSync(f, "utf8");

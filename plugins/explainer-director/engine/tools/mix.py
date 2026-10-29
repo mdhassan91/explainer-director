@@ -54,7 +54,7 @@ def pad_tone(f, dur):
     return v * np.minimum(1, tt / 0.7) * np.clip((dur + 0.8 - tt) / 0.8, 0, 1)
 def piano(f, dur=2.2):
     n = int(dur * SR); tt = np.arange(n) / SR; v = np.zeros(n)
-    for k, a in zip((1, 2, 3, 4, 5), (1, 0.45, 0.22, 0.1, 0.05)): v += a * np.sin(2 * np.pi * f * k * tt * (1 + 0.0004 * k * k)) * np.exp(-tt * (1.6 + 1.3 * k))
+    for k, a in zip((1, 2, 3, 4, 5), (1, 0.45, 0.22, 0.1, 0.05), strict=True): v += a * np.sin(2 * np.pi * f * k * tt * (1 + 0.0004 * k * k)) * np.exp(-tt * (1.6 + 1.3 * k))
     return v * np.minimum(1, tt / 0.004)
 def kick():
     n = int(0.35 * SR); tt = np.arange(n) / SR; f = 50 + 70 * np.exp(-tt * 25)

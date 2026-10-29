@@ -8,7 +8,7 @@ usage: python tools/voice.py <id> [--workers 3] [--narrator-speed 1.15] [--speed
 in:  src/<id>/beats.json, optional src/<id>/say.json ({"Nguyen": "Win"} pronunciation fixes)
 out: public/<id>/voice.wav + src/<id>/lines.json {duration, cards:[{id,title,year,start,end}], beats:[{id,chapter,start,end,lines:[{who,start,end,words}]}]}
 Word times inside a phrase ∝ phoneme count, snapped to energy dips (no ASR model needed). Title card goes after the cold open's last beat."""
-import hashlib, json, os, re, sys, urllib.error, urllib.request
+import hashlib, json, os, re, sys, urllib.error, urllib.parse, urllib.request
 from multiprocessing import Pool
 import numpy as np, soundfile as sf
 ROOT = os.environ.get("ED_ROOT") or os.path.dirname(os.path.dirname(os.path.abspath(__file__))); SR = 24000
@@ -32,6 +32,9 @@ def phonemes(word):
     if K is None: return max(1, round(len(w) * 0.8))   # no Kokoro model: letters ≈ phonemes
     return max(1, len(re.sub(r"[ˈˌː\s]", "", K.tokenizer.phonemize(w.lower(), "en-us"))))
 EL_BASE = os.environ.get("ELEVENLABS_API_BASE", "https://api.elevenlabs.io").rstrip("/")
+_u = urllib.parse.urlparse(EL_BASE)
+if not (_u.scheme == "https" or (_u.scheme == "http" and _u.hostname in ("127.0.0.1", "localhost"))):
+    sys.exit(f"ELEVENLABS_API_BASE must be https:// (or http://localhost for tests), got {EL_BASE}")
 EL_MODEL = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
 def elevenlabs(say, voice_id, speed):
     key = os.environ.get("ELEVENLABS_API_KEY")
@@ -39,12 +42,13 @@ def elevenlabs(say, voice_id, speed):
     body = {"text": say, "model_id": EL_MODEL}
     if speed is not None: body["voice_settings"] = {"speed": min(1.2, max(0.7, speed))}
     cdir = f"{ROOT}/public/{pid}/.tts-cache"; os.makedirs(cdir, exist_ok=True)
-    cf = f"{cdir}/el-{hashlib.sha1(json.dumps([voice_id, body], sort_keys=True).encode()).hexdigest()[:16]}.pcm"
+    cf = f"{cdir}/el-{hashlib.sha1(json.dumps([voice_id, body], sort_keys=True).encode(), usedforsecurity=False).hexdigest()[:16]}.pcm"
     if not os.path.exists(cf):
-        req = urllib.request.Request(f"{EL_BASE}/v1/text-to-speech/{voice_id}?output_format=pcm_24000", data=json.dumps(body).encode(),
-                                     headers={"xi-api-key": key, "Content-Type": "application/json", "Accept": "audio/pcm"})
+        req = urllib.request.Request(  # noqa: S310 — scheme checked at start
+                                    f"{EL_BASE}/v1/text-to-speech/{urllib.parse.quote(voice_id, safe='')}?output_format=pcm_24000", data=json.dumps(body).encode(),
+                                     headers={"xi-api-key": key, "Content-Type": "application/json", "Accept": "audio/pcm"})  # noqa: S310 — scheme checked at start
         try:
-            with urllib.request.urlopen(req, timeout=120) as r: pcm = r.read()
+            with urllib.request.urlopen(req, timeout=120) as r: pcm = r.read()  # noqa: S310 — scheme checked at start
         except urllib.error.HTTPError as e: raise RuntimeError(f"ElevenLabs error {e.code} for voice {voice_id}: {e.read()[:300].decode(errors='replace')}") from None
         except urllib.error.URLError as e: raise RuntimeError(f"cannot reach ElevenLabs at {EL_BASE}: {e.reason}") from None
         with open(cf + ".tmp", "wb") as f: f.write(pcm)
@@ -79,7 +83,7 @@ def beat_audio(b):
         phrases = [p.strip() for p in re.findall(r"[^,.?!:;…]+[,.?!:;…]*", L["text"]) if p.strip()]
         for pi, ph in enumerate(phrases):
             a = synth(ph, L["voice"], NSPEED if L["who"] == "N" else SPEED); ws = ph.split()
-            for w, (s, e) in zip(ws, word_times(a, ws)): words.append({"t": w, "s": t + s, "e": t + e})
+            for w, (s, e) in zip(ws, word_times(a, ws), strict=True): words.append({"t": w, "s": t + s, "e": t + e})
             parts.append(a); t += len(a) / SR
             if pi < len(phrases) - 1: sil(PAUSE.get(ph[-1], 0.08))
         lines.append({"who": L["who"], "start": ls, "end": t, "words": words})
@@ -92,13 +96,14 @@ if __name__ == "__main__":
         sys.exit("ELEVENLABS_API_KEY is not set, but cast.json uses an ElevenLabs voice")
     if any(not v.startswith("elevenlabs:") for v in voices) and not (os.path.exists(MODEL) and os.path.exists(VOICES)):
         sys.exit(f"Kokoro model not found in {KDIR} (run setup.sh, or set KOKORO_DIR)")
+    if "--workers" not in args and all(v.startswith("elevenlabs:") for v in voices): WORKERS = 4   # network-bound: overlap the requests
     try:
         with Pool(WORKERS, initializer=init) as pool: res = pool.map(beat_audio, [b for _, b in flat], chunksize=1)
     except RuntimeError as e: sys.exit(f"voice failed: {e}")
     out, t, beats, cards = [np.zeros(int(0.6 * SR), np.float32)], 0.6, [], []
     sh = lambda L, o: {**L, "start": round(L["start"] + o, 3), "end": round(L["end"] + o, 3), "words": [{"t": w["t"], "s": round(w["s"] + o, 3), "e": round(w["e"] + o, 3)} for w in L["words"]]}
     seen = set(); first_ch = B["chapters"][0]["id"]; last_open = B["chapters"][0]["beats"][-1]["id"]
-    for (ch, b), (a, lines) in zip(flat, res):
+    for (ch, b), (a, lines) in zip(flat, res, strict=True):
         if ch["id"] not in seen:
             seen.add(ch["id"])
             if ch["id"] != first_ch: cards.append({"id": ch["id"], "title": ch["title"], "year": ch["year"], "start": round(t, 3), "end": round(t + CARD, 3)}); out.append(np.zeros(int(CARD * SR), np.float32)); t += CARD

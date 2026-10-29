@@ -1,6 +1,7 @@
 #!/bin/bash
 # LIBRARY · review stills: renders the <Comp>Samples composition (3 moments per beat) at half size → out/<id>-samples/sheet-NN.jpg (4×4 each)
 # usage: tools/samples.sh <id> <SamplesComposition>
+[[ "$1" =~ ^[A-Za-z0-9_-]+$ && "$2" =~ ^[A-Za-z0-9_-]+$ ]] || { echo "usage: tools/samples.sh <id> <SamplesComposition> (letters, digits, - and _)"; exit 1; }
 cd "$(dirname "$0")/.."
 o=out/$1-samples; rm -rf $o; mkdir -p $o
 npx remotion render src/index.ts $2 $o --sequence --image-format=jpeg --scale=0.5 --concurrency=4 --log=error </dev/null || exit 1

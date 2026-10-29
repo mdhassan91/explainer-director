@@ -38,6 +38,10 @@ On older Claude Code versions:
 Then ask Claude: "make a video from this script". On the first run it copies the engine into your folder and runs
 `setup.sh` (npm packages, Python packages, the Kokoro voice model ~330 MB, 8 sound effects).
 
+## Check that it works
+Inside your copy of the engine: `bash tests/selftest.sh` (about a minute, no downloads): beats and cue check on
+the example, unsafe names refused, the ElevenLabs path against a fake local server, and one rendered frame.
+
 ## Licence and credits
 MIT, see LICENSE. Fonts (SIL OFL, licence files next to them), voices, sound effects and ideas this builds on: CREDITS.md.
 Remotion is free for individuals and small companies; larger companies need a Remotion company licence.

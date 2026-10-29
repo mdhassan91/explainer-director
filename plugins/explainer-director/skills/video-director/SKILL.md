@@ -24,6 +24,7 @@ This skill decides the order of work. Everything it needs ships with this plugin
 3. Prove the setup with the bundled example: `python3 tools/beats.py example && python3 tools/check.py example &&
    python3 tools/voice.py example && python3 tools/mix.py example && node tools/render-film.mjs example Example --draft`
    → `out/example-draft.mp4` (≈ 70 s film).
+   Quicker check without rendering a film: `bash tests/selftest.sh`.
 
 ## Templates first
 Most beats need no code. Before writing a scene, check the templates in `engine/src/lib/templates.tsx`

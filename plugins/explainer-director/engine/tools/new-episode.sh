@@ -3,6 +3,7 @@
 # Creates src/<id>/ {script.txt cast.json say.json meta.json sound.json scenes.tsx <Comp>.tsx} and registers <Comp> + <Comp>Samples in Root.tsx.
 set -e; cd "$(dirname "$0")/.."
 id=$1; C=$2; T=${3:-$1}; d=src/$id
+[[ "$id" =~ ^[A-Za-z0-9_-]+$ && "$C" =~ ^[A-Za-z][A-Za-z0-9_]*$ ]] || { echo "id: letters, digits, - and _ · ComponentName: a letter, then letters/digits/_"; exit 1; }
 [ -z "$C" ] && { echo "usage: tools/new-episode.sh <id> <ComponentName> \"<TITLE>\""; exit 1; }
 [ -e $d ] && { echo "$d already exists"; exit 1; }
 mkdir -p $d

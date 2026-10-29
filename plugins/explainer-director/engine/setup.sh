@@ -11,7 +11,12 @@ echo "▶ Python packages"; $PY -m pip install -q -r requirements.txt
 K=${KOKORO_DIR:-$HOME/.cache/explainer-director/kokoro}; mkdir -p "$K"
 U=https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0
 if [ "${SKIP_KOKORO:-0}" = "1" ]; then echo "▶ Kokoro skipped (SKIP_KOKORO=1): only ElevenLabs voices will work"
-else for f in kokoro-v1.0.onnx voices-v1.0.bin; do [ -s "$K/$f" ] || { echo "▶ Kokoro $f"; curl -fL -o "$K/$f" "$U/$f"; }; done; fi
+else for f in kokoro-v1.0.onnx voices-v1.0.bin; do [ -s "$K/$f" ] || { echo "▶ Kokoro $f"; curl -fL -o "$K/$f.part" "$U/$f" && mv "$K/$f.part" "$K/$f"; }; done
+  (cd "$K" && sha256sum -c --quiet - <<SUMS) || { echo "Kokoro files do not match the expected checksums — delete $K and run again"; exit 1; }
+7d5df8ecf7d4b1878015a32686053fd0eebe2bc377234608764cc0ef3636a6c5  kokoro-v1.0.onnx
+bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d  voices-v1.0.bin
+SUMS
+fi
 if [ ! -s public/lib/sfx/pop.mp3 ]; then
   echo "▶ sound effects"; T=$(mktemp -d); (cd "$T" && npm pack -s hyperframes@0.8.196 >/dev/null && tar xzf hyperframes-*.tgz)
   S="$T/package/dist/skills/media-use/audio/assets/sfx"; mkdir -p public/lib/sfx
