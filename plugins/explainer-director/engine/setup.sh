@@ -23,4 +23,4 @@ if [ ! -s public/lib/sfx/pop.mp3 ]; then
   for s in pop whoosh-short chime impact-bass-1 impact-bass-2 riser typing click; do cp "$S/$s.mp3" public/lib/sfx/; done
   cp "$S/CREDITS.md" public/lib/sfx/CREDITS.md; rm -rf "$T"
 fi
-echo "✔ ready. Try the example:  bash tools/new-episode.sh … or render examples/ (see README)"
+echo "✔ ready. Check it: bash tests/selftest.sh   ·   example film: python3 tools/beats.py example && python3 tools/check.py example && python3 tools/voice.py example && python3 tools/mix.py example && node tools/render-film.mjs example Example --draft"

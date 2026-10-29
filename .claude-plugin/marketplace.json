@@ -1,12 +1,14 @@
 {
   "name": "explainer-director",
-  "owner": { "name": "Mohammad Hassan" },
+  "owner": {
+    "name": "Mohammad Hassan"
+  },
   "description": "Long-form animated explainer videos with Claude Code, from script to final film.",
   "plugins": [
     {
       "name": "explainer-director",
       "source": "./plugins/explainer-director",
-      "description": "Turn a script into a 5–20 minute narrated, animated explainer: beat map, story check, style bake-off, scene build, draft and final render, with approval gates before anything expensive renders."
+      "description": "Script to long-form animated explainer (5–20 min): beat map, approval gates, 12 scene templates, word-synced voices and music, renders on a 4 GB GPU."
     }
   ]
 }

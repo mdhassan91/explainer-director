@@ -21,10 +21,20 @@ SAYF = f"{ROOT}/src/{pid}/say.json"; SAY = json.load(open(SAYF)) if os.path.exis
 PAUSE = {",": 0.13, ";": 0.2, ":": 0.26, ".": 0.28, "?": 0.32, "!": 0.28, "…": 0.4}
 GAP_LINE, GAP_BEAT, CARD, TITLE, TAIL = 0.32, 0.5, 5.5, 5.5, 5.0
 K = None
+def espeak_data():
+    """espeak-ng silently ignores a data path longer than ~160 chars (deep venvs, conda) and then exits the process;
+    copy the data (19 MB, once) to a short path in KDIR instead (a symlink doesn't help: espeak resolves it)."""
+    import shutil, espeakng_loader; d = espeakng_loader.get_data_path()
+    if len(d) < 150: return d
+    short = os.path.join(KDIR, "espeak-ng-data")
+    if not os.path.exists(os.path.join(short, "phontab")):
+        for p in (short, short + ".tmp"): shutil.rmtree(p, ignore_errors=True)
+        shutil.copytree(d, short + ".tmp"); os.replace(short + ".tmp", short)
+    return short
 def init():
     global K
     if os.path.exists(MODEL) and os.path.exists(VOICES):
-        import kokoro_onnx; K = kokoro_onnx.Kokoro(MODEL, VOICES)
+        import kokoro_onnx; K = kokoro_onnx.Kokoro(MODEL, VOICES, espeak_config=kokoro_onnx.EspeakConfig(data_path=espeak_data()))
 strip = lambda w: w.strip(",.?!:;…\"'")
 def phonemes(word):
     w = re.sub(r"[^A-Za-z']", "", SAY.get(strip(word), word))
@@ -98,7 +108,9 @@ if __name__ == "__main__":
         sys.exit(f"Kokoro model not found in {KDIR} (run setup.sh, or set KOKORO_DIR)")
     if "--workers" not in args and all(v.startswith("elevenlabs:") for v in voices): WORKERS = 4   # network-bound: overlap the requests
     try:
-        with Pool(WORKERS, initializer=init) as pool: res = pool.map(beat_audio, [b for _, b in flat], chunksize=1)
+        if WORKERS == 1: init(); res = [beat_audio(b) for _, b in flat]   # in-process: a crash shows its error instead of hanging a pool
+        else:
+            with Pool(WORKERS, initializer=init) as pool: res = pool.map(beat_audio, [b for _, b in flat], chunksize=1)
     except RuntimeError as e: sys.exit(f"voice failed: {e}")
     out, t, beats, cards = [np.zeros(int(0.6 * SR), np.float32)], 0.6, [], []
     sh = lambda L, o: {**L, "start": round(L["start"] + o, 3), "end": round(L["end"] + o, 3), "words": [{"t": w["t"], "s": round(w["s"] + o, 3), "e": round(w["e"] + o, 3)} for w in L["words"]]}
