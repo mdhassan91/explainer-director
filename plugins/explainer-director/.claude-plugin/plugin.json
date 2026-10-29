@@ -1,0 +1,21 @@
+{
+  "name": "explainer-director",
+  "displayName": "Explainer Director",
+  "description": "Script to long-form animated explainer (5\u201320 min): beat map, approval gates, 2D/3D styles, Remotion render that runs on a 4 GB GPU.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Mohammad Hassan"
+  },
+  "keywords": [
+    "video",
+    "explainer",
+    "remotion",
+    "animation",
+    "e-learning",
+    "claude-code"
+  ],
+  "license": "MIT",
+  "icon": ".claude-plugin/icon.png",
+  "homepage": "https://github.com/mdhassan91/explainer-director",
+  "repository": "https://github.com/mdhassan91/explainer-director"
+}

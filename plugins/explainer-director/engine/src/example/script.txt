@@ -1,0 +1,32 @@
+# ch0 | COLD OPEN | today | now
+= b01 | KINETIC | the hook
+& kinetic {"items":[{"on":"confident","text":"CONFIDENT","color":"glow","size":160},{"on":"wrong","text":"AND WRONG","size":130,"as":"stamp"}]}
+N: An AI answer can sound confident, and still be wrong.
+
+# ch1 | THE QUESTION | 2026 | now
+= b02 | BIG NUMBER | the answer the agent gave
+& bigNumber {"on":"orders","to":20666,"label":"ORDERS, SAYS THE AGENT","tape":{"on":"fluent","text":"FLUENT · FAST · SURE"}}
+N: Ask a data agent how many orders there were. It says twenty thousand orders. Fluent, fast, and sure.
+= b03 | BARS | the answer vs the truth
+& bars {"title":{"on":"truth","text":"AGENT VS TRUTH"},"max":100000,"items":[{"label":"AGENT","v":20666,"on":"agent","txt":"20,666","color":"grey"},{"label":"TRUTH","v":99441,"on":"real","txt":"99,441"}]}
+N: But the truth was five times bigger. The agent said twenty thousand. The real number was almost one hundred thousand.
+
+# ch2 | THE CAUSE | 2026 | cool2000
+= b04 | PROCESS | where the data went missing
+& process {"steps":["EXPORT","IMPORT","TABLES","QUERY","ANSWER"],"cuts":[{"step":"IMPORT","on":"partly","why":"5 OF 9 PARTIAL"}],"title":{"on":"data","text":"THE DATA, NOT THE MODEL"}}
+N: The model was fine. Five of nine tables were only partly imported. The problem was the data, not the model.
+= b05 | DIALOGUE | engineer and reviewer
+& dialogue {"set":"office","left":{"who":"DEV","shirt":"jade","hair":"side"},"right":{"who":"LEAD","shirt":"#6D6455","glasses":true},"title":{"on":"count","text":"COUNT THE ROWS","color":"danger"}}
+LEAD: How do you know the answer is right?
+DEV: I count the rows, and compare them with the totals I already know.
+
+# ch3 | THE FIX | 2026 | jade
+= b06 | SPLIT | before and after
+& split {"left":{"title":"TRUST","on":"trust","icon":"brain"},"right":{"title":"CHECK","on":"check","icon":"check"}}
+N: So do not just trust the answer. Check it.
+= b07 | ICONS | the three checks
+& icons {"title":{"on":"checks","text":"THREE CHECKS"},"icons":[{"name":"shield","on":"read","label":"READ-ONLY SQL"},{"name":"doc","on":"log","label":"AUDIT LOG"},{"name":"bars","on":"totals","label":"KNOWN TOTALS"}]}
+N: Three checks: read only queries, a log of every answer, and known totals to test against.
+= b08 | HERO | the takeaway
+& hero {"icon":"check","on":"measure","label":"MEASURE BEFORE YOU TRUST","scale":1.6}
+N: Measure the agent, before you trust it.

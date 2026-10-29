@@ -1,0 +1,33 @@
+{
+  "name": "explainer-director-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Render engine for Explainer Director: script.txt -> narrated, scored, animated explainer (Remotion).",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "new": "bash tools/new-episode.sh",
+    "beats": "python3 tools/beats.py",
+    "voice": "python3 tools/voice.py",
+    "mix": "python3 tools/mix.py",
+    "check": "python3 tools/check.py",
+    "render": "node tools/render-film.mjs"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.8.1",
+    "@remotion/cli": "4.0.534",
+    "@remotion/three": "4.0.534",
+    "postprocessing": "6.39.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.534",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/three": "0.186.0",
+    "typescript": "7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
+  }
+}

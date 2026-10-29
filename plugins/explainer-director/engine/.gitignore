@@ -1,0 +1,6 @@
+node_modules/
+out/
+build-*/
+public/*/voice.wav
+public/*/mix.wav
+public/lib/sfx/
