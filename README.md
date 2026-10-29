@@ -1,4 +1,4 @@
-# Explainer Director (working name)
+# Explainer Director
 
 Turn a script into a **narrated, scored, animated explainer video** with Claude Code, on your own machine.
 You approve the beat map, the look and a draft before the final render. Built for long videos (5–20 min):
@@ -6,7 +6,7 @@ training and e-learning explainers, lesson-by-lesson summaries, business-history
 
 ![frames from the bundled example](docs/example-frames.jpg)
 
-> Status: v0.1 draft, not published yet. See TODO.md.
+> Status: v0.1, first public release.
 
 ## What you get
 - **video-director** skill: intake → beat map (gate 1) → look check (gate 2) → voice + music → draft (gate 3) → final,
@@ -41,6 +41,10 @@ Then ask Claude: "make a video from this script". On the first run it copies the
 ## Check that it works
 Inside your copy of the engine: `bash tests/selftest.sh` (about a minute, no downloads): beats and cue check on
 the example, unsafe names refused, the ElevenLabs path against a fake local server, and one rendered frame.
+
+## Coming later
+- **Characters**: a painted character kit for story-driven films with recurring cast members.
+- **3D**: stylized 3D scenes alongside the flat 2D look.
 
 ## Licence and credits
 MIT, see LICENSE. Fonts (SIL OFL, licence files next to them), voices, sound effects and ideas this builds on: CREDITS.md.
